@@ -1,14 +1,13 @@
 interface IChat {
-  id: string
+  id: number
   msg: string
+  userId: string
   timestamp: number
 }
 interface IUser {
   id: string
   nickname?: string
 }
-
-// type TSocketMessageType = 'userStatus' | 'chat'
 
 type ISocketMessage =
   | {
@@ -18,7 +17,11 @@ type ISocketMessage =
       }
     }
   | {
-      type: 'chat'
+      type: 'chatUp'
+      payload: Pick<IChat, 'msg'>
+    }
+  | {
+      type: 'chatDown'
       payload: IChat
     }
 

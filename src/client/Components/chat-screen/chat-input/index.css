@@ -6,13 +6,13 @@
   align-items: center;
 }
 
-#chat-input {
+.chat-input {
   flex-grow: 1;
   margin-left: 10px;
   margin-right: 10px;
 }
 
-#internet-status-indeicator {
+.internet-status-indeicator {
   display: block;
   width: 25px;
   height: 25px;

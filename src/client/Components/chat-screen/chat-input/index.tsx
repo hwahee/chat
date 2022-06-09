@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { IChat } from '../../../../common/types'
 import { useSocket } from '../../../hooks/use-socket'
 
@@ -6,73 +6,52 @@ import './index.css'
 
 /** 연결되어 있으면, 초록불, 연결이 안 됐으면 빨간불 */
 const InternetStatusIndicator = () => {
-  const { socket } = useSocket()
-  const [connStatus, setConnStatus] = useState(false)
-
-  useEffect(() => {
-    if (socket && socket.readyState === socket.OPEN) {
-      setConnStatus(true)
-    } else {
-      setConnStatus(false)
-    }
-  }, [socket, socket?.readyState])
-
+  const { isReady } = useSocket()
   return (
     <span
-      id='internet-status-indeicator'
-      style={{ backgroundColor: connStatus ? 'green' : 'red' }}
-    ></span>
+      className='internet-status-indeicator'
+      style={{ backgroundColor: isReady ? 'green' : 'red' }}
+    />
   )
 }
 /** 채팅을 입력하는 부분
  * enter를 누르거나 send 버튼을 눌러서 보낼 수 있다
  */
 const ChatInput = () => {
-  const { socket, id } = useSocket()
-  const inputInputRef = useRef<HTMLInputElement>(null!)
-  const inputSendRef = useRef<HTMLInputElement>(null!)
+  const [chatInput, setChatInput] = useState('')
+  const { sendMessage, id: myId } = useSocket()
 
   const send = useCallback(() => {
-    if (!(socket && socket.readyState === socket.OPEN)) {
-      console.error('socket not ready')
-      return
-    }
+    sendMessage({ type: 'chatUp', payload: { msg: chatInput } })
+    setChatInput('')
+  }, [chatInput, sendMessage])
 
-    const chatDataToSend: IChat = {
-      id: id, //socket.id,
-      msg: inputInputRef.current.value,
-      timestamp: new Date().getTime(),
-    }
-    socket.send(JSON.stringify({ type: 'chat', payload: chatDataToSend }))
-    inputInputRef.current.value = ''
-  }, [id, socket])
   const enterToSend = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Enter' && 0 < inputInputRef.current.value.length) {
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter' && !e.shiftKey && 0 < chatInput.length) {
         send()
       }
     },
-    [send],
+    [chatInput.length, send],
   )
-
-  useEffect(() => {
-    inputSendRef.current.addEventListener('click', send)
-    inputInputRef.current.addEventListener('keydown', enterToSend)
-    return () => {
-      inputSendRef.current.removeEventListener('click', send)
-      inputInputRef.current.removeEventListener('keydown', enterToSend)
-    }
-  }, [enterToSend, send, socket])
 
   return (
     <div className='chat-input-wrap'>
       <InternetStatusIndicator />
-      <input ref={inputInputRef} id='chat-input' type='text' />
       <input
-        ref={inputSendRef}
-        id='chat-input-send'
+        className='chat-input'
+        type='text'
+        value={chatInput}
+        onChange={e => {
+          setChatInput(e.currentTarget.value)
+        }}
+        onKeyDown={enterToSend}
+      />
+      <input
+        className='chat-input-send'
         type='button'
         value='send'
+        onClick={send}
       />
     </div>
   )

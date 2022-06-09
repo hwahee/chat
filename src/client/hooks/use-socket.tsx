@@ -8,15 +8,18 @@ import React, {
 import { IChat, ISocketMessage, IUser } from '../../common/types'
 
 const NetworkContext = createContext<{
-  socket?: WebSocket
   id: string
   chatData: IChat | null
   userData: { [key: string]: IUser }
+  sendMessage(msg: ISocketMessage): void
+  isReady: boolean
 }>({
   // socket: new WebSocket('ws://127.0.0.1:3000'),
   id: '',
   chatData: null,
   userData: {},
+  sendMessage: () => null,
+  isReady: false,
 })
 const NetworkProvider = ({ children }: { children: React.ReactNode }) => {
   const [id] = useState(crypto.randomUUID())
@@ -36,23 +39,33 @@ const NetworkProvider = ({ children }: { children: React.ReactNode }) => {
 
       switch (msg.type) {
         case 'userStatus':
-          setUserData(msg.payload as { [key: string]: IUser })
+          setUserData(msg.payload)
           break
-        case 'chat':
-          setChatData(msg.payload as IChat)
+        case 'chatDown':
+          setChatData(msg.payload)
           break
       }
     }
   }, [socket])
 
+  const isSocketReady = socket?.readyState === socket?.OPEN
+
   const value = useMemo(() => {
     return {
-      socket,
       id,
       chatData,
       userData,
+      isReady: isSocketReady,
+      sendMessage(msg: ISocketMessage) {
+        if (!isSocketReady || !socket) {
+          console.error('socket not ready')
+          return
+        }
+
+        socket.send(JSON.stringify(msg))
+      },
     }
-  }, [socket, id, chatData, userData])
+  }, [id, chatData, userData, isSocketReady, socket])
 
   return (
     <NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>
@@ -60,8 +73,7 @@ const NetworkProvider = ({ children }: { children: React.ReactNode }) => {
 }
 
 const useSocket = () => {
-  const { socket, id, chatData, userData } = useContext(NetworkContext)
-  return { socket, id, chatData, userData }
+  return useContext(NetworkContext)
 }
 
 export { NetworkProvider, useSocket }
