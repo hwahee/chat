@@ -1,0 +1,20 @@
+.chat-input-wrap {
+    height: 5%;
+    padding:0 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#chat-input {
+    flex-grow: 1;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#internet-status-indeicator {
+    display: block;
+    width: 25px;
+    height: 25px;
+    border-radius: 12.5px;
+}

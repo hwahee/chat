@@ -6,7 +6,7 @@ import { copyFile } from 'fs'
 
 esbuild
   .build({
-    entryPoints: ['src/index.tsx'],
+    entryPoints: ['src/client/index.tsx'],
     bundle: true,
     // minify: true,
     sourcemap: true,
@@ -14,28 +14,23 @@ esbuild
     outdir: 'build',
     watch: {
       onRebuild(error) {
-        if (error) throw error
-        else
+        if (error) {
+          console.error('build error: ', error)
+        } else {
           copyFile(
             path.join(__dirname, 'public/index.html'),
             path.join(__dirname, 'build/index.html'),
             err => {
-              if (err) throw err
-              console.log('Build Done')
+              if (err) {
+                console.error('copy file error: ', err)
+              } else {
+                console.log('Build Done')
+              }
             },
           )
+        }
       },
     },
-  })
-  .then(() => {
-    copyFile(
-      path.join(__dirname, 'public/index.html'),
-      path.join(__dirname, 'build/index.html'),
-      err => {
-        if (err) throw err
-        console.log('Build Done')
-      },
-    )
   })
   .catch(err => {
     console.error(err)

@@ -17,5 +17,12 @@
     "editor.suggest.insertMode": "replace",
     "gitlens.codeLens.scopes": ["document"]
   },
-  "workbench.settings.useSplitJSON": true
+  "workbench.settings.useSplitJSON": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "eslint.packageManager": "yarn"
 }

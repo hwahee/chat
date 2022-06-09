@@ -1,0 +1,4 @@
+.user-list {
+    border: 1px solid black;
+    flex-shrink: 0;
+}

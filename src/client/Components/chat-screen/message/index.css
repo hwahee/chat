@@ -1,0 +1,12 @@
+.message-window {
+    border: 1px solid black;
+    flex-grow: 1;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+}
+
+.message {
+    width: 100%;
+    word-break: break-all;
+}
