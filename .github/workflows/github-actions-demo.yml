@@ -9,3 +9,7 @@ jobs:
         run: yarn
       - name: Run ESLint
         run: yarn eslint
+      - name: Run Prettier
+        run: yarn prettier --check src/
+      - name: Run Typescript Typecheck
+        run: yarn tsc --noEmit
